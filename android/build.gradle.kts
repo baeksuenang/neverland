@@ -1,10 +1,17 @@
-allprojects {
-    repositories {
+buildscript {
+    repositories {  // ✅ 이 부분 추가!!
         google()
         mavenCentral()
     }
     dependencies {
-        classpath("com.google.gms:google-services:4.3.15")
+        classpath("com.google.gms:google-services:4.3.15") // ✅ Firebase Gradle 플러그인
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
     }
 }
 
@@ -23,8 +30,3 @@ tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
 
-buildscript {
-    dependencies {
-        classpath("com.google.gms:google-services:4.3.15") // ✅ Firebase Gradle 플러그인
-    }
-}

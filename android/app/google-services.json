@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "987941705773",
-    "project_id": "neverlandv1-c24b7",
-    "storage_bucket": "neverlandv1-c24b7.firebasestorage.app"
+    "project_number": "1080735080948",
+    "project_id": "neverland-349ba",
+    "storage_bucket": "neverland-349ba.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:987941705773:android:a0c262ae072afa36c540a4",
+        "mobilesdk_app_id": "1:1080735080948:android:7bb19df03dc39032e699a1",
         "android_client_info": {
           "package_name": "com.example.neverlandv1"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDXLTcnF0xXn10aIgPyptcU1oNBTtE0kiY"
+          "current_key": "AIzaSyByyhVrbR2_-RwNER5yfsYw77qfT0kW_Hc"
         }
       ],
       "services": {
