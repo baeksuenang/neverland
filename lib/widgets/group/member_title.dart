@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:neverlandv1/models/group.dart';
+
 class MemberTile extends StatelessWidget {
   final Member member;
   final VoidCallback onExpel;

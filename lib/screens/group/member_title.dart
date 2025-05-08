@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:neverlandv1/models/group.dart';
 
-class MemberTile extends StatelessWidget {
+class MemberTitle extends StatelessWidget {
   final Member member;
   final VoidCallback onExpel;
 
-  const MemberTile({
+  const MemberTitle({
     required this.member,
     required this.onExpel,
     super.key,

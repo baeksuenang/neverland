@@ -3,7 +3,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart'; // flutterfire configure가 만든 파일
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
-import 'screens/login_screen.dart';
 import 'screens/group/group_create_screen.dart';
 
 void main() async {
