@@ -24,7 +24,10 @@ dev_dependencies:
 
 
 flutter:
-
   uses-material-design: true
+  assets:
+    - assets/z.png
+    - assets/neverland.png
+    - assets/intro_logo.png
 
 
