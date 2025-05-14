@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+import 'login_screen.dart';
 
 class IntroScreen extends StatelessWidget {
   const IntroScreen({Key? key}) : super(key: key);
@@ -12,10 +14,10 @@ class IntroScreen extends StatelessWidget {
           children: [
             Positioned(
               top: 80,
-              right: 0, // 오른쪽 끝으로 붙이기
+              right: 0,
               child: Image.asset(
                 'assets/intro_logo.png',
-                height: 280, // 크기 키움
+                height: 280,
               ),
             ),
             Positioned(
@@ -47,7 +49,7 @@ class IntroScreen extends StatelessWidget {
               right: 40,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: 버튼 누를 때 동작 추가
+                  // 여긴 그냥 버튼 클릭 아무 동작 안해도 됨
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.cyanAccent,
@@ -71,16 +73,25 @@ class IntroScreen extends StatelessWidget {
               right: 40,
               child: Center(
                 child: RichText(
-                  text: const TextSpan(
+                  text: TextSpan(
                     text: "Don't have an account?\n",
-                    style: TextStyle(color: Colors.white, fontSize: 14),
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
                     children: [
                       TextSpan(
                         text: '         Resister now!',
-                        style: TextStyle(
+                        style: const TextStyle(
                           color: Colors.cyanAccent,
                           fontWeight: FontWeight.bold,
                         ),
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const LoginScreen(),
+                              ),
+                            );
+                          },
                       ),
                     ],
                   ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../screens/group_screen.dart';
 
 class AuthProvider with ChangeNotifier {
   final emailController = TextEditingController();
@@ -13,7 +14,10 @@ class AuthProvider with ChangeNotifier {
         password: passwordController.text.trim(),
       );
       message = '로그인 성공!';
-      Navigator.pushReplacementNamed(context, '/group_create');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const GroupScreen()),
+      );
     } on FirebaseAuthException catch (e) {
       message = '로그인 실패: [${e.code}] ${e.message}';
     } catch (e) {
@@ -22,7 +26,6 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   Future<void> register() async {
     try {
@@ -36,7 +39,7 @@ class AuthProvider with ChangeNotifier {
     } catch (e) {
       message = '회원가입 실패: $e';
     } finally {
-      notifyListeners();  // 항상 UI 업데이트
+      notifyListeners();
     }
   }
 
