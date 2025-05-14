@@ -47,29 +47,30 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDifb4gjTdBYDa4jphNb7gbuwALr5e0Gv4',
-    appId: '1:1080735080948:web:78e071ca25abbd43e699a1',
-    messagingSenderId: '1080735080948',
-    projectId: 'neverland-349ba',
-    authDomain: 'neverland-349ba.firebaseapp.com',
-    storageBucket: 'neverland-349ba.firebasestorage.app',
-    measurementId: 'G-V5J21659TP',
+    apiKey: 'AIzaSyDAUb8IvBSLLl1OU5GgIWtfO_rDTyjaQms',
+    appId: '1:691253356942:web:629d061c98d30f1cde5cdf',
+    messagingSenderId: '691253356942',
+    projectId: 'neverland-v1-second',
+    authDomain: 'neverland-v1-second.firebaseapp.com',
+    storageBucket: 'neverland-v1-second.firebasestorage.app',
+    measurementId: 'G-BJEP16FDCC',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyByyhVrbR2_-RwNER5yfsYw77qfT0kW_Hc',
-    appId: '1:1080735080948:android:7bb19df03dc39032e699a1',
-    messagingSenderId: '1080735080948',
-    projectId: 'neverland-349ba',
-    storageBucket: 'neverland-349ba.firebasestorage.app',
+    apiKey: 'AIzaSyB8d-47X40o1D4M8Wld3LZ374FKhNDqCMU',
+    appId: '1:691253356942:android:dffecf22fa407964de5cdf',
+    messagingSenderId: '691253356942',
+    projectId: 'neverland-v1-second',
+    storageBucket: 'neverland-v1-second.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBd8k7hpuyw5GUDAVvxCv3aqQ4avfnztb0',
-    appId: '1:1080735080948:ios:35d29effcfb4778ae699a1',
-    messagingSenderId: '1080735080948',
-    projectId: 'neverland-349ba',
-    storageBucket: 'neverland-349ba.firebasestorage.app',
+    apiKey: 'AIzaSyCog1zKB5LNM4ohZMbK2IQ42D_8XywfPTo',
+    appId: '1:691253356942:ios:15c00d5324c6d7d4de5cdf',
+    messagingSenderId: '691253356942',
+    projectId: 'neverland-v1-second',
+    storageBucket: 'neverland-v1-second.firebasestorage.app',
     iosBundleId: 'com.example.neverlandv1',
   );
+
 }
