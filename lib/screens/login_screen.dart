@@ -26,7 +26,7 @@ class LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: authProvider.login,
+              onPressed: () => authProvider.login(context),
               child: const Text('로그인'),
             ),
             ElevatedButton(

@@ -3,6 +3,10 @@ buildscript {
         google()
         mavenCentral()
     }
+    dependencies {
+        // ✅ Firebase plugin 추가 (Firestore, Auth 등 포함)
+        classpath("com.google.gms:google-services:4.4.1")
+    }
 }
 
 allprojects {
