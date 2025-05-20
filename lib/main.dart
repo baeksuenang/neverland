@@ -4,7 +4,6 @@ import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'screens/intro_screen.dart';
-import 'screens/group_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../screens/group_screen.dart';
-import '../screens/position_selection_screen.dart';
 
 class AuthProvider with ChangeNotifier {
   final emailController = TextEditingController();
@@ -36,9 +35,10 @@ class AuthProvider with ChangeNotifier {
       );
       message = '회원가입 성공!';
 
+      // 회원가입 성공 시 자동 로그인 → 바로 GroupScreen 이동
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const PositionSelectionScreen()),
+        MaterialPageRoute(builder: (context) => const GroupScreen()),
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
@@ -52,7 +52,6 @@ class AuthProvider with ChangeNotifier {
       notifyListeners();
     }
   }
-
 
   @override
   void dispose() {
