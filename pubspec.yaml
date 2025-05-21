@@ -20,6 +20,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_svg: ^2.0.7
 
   flutter_lints: ^5.0.0
 
@@ -30,5 +31,8 @@ flutter:
     - assets/z.png
     - assets/neverland.png
     - assets/intro_logo.png
-
+    - assets/people1.png
+    - assets/people2.png
+    - assets/people3.png
+    - assets/people4.png
 

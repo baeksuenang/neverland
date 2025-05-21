@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'invite/no_invite_screen.dart';
-import 'group/group_create_screen.dart';   // manager용 화면 import
+import 'group/add_teammates_screen.dart'; // ✅ 이 화면으로 이동할 거임
 
 class PositionSelectionScreen extends StatelessWidget {
   const PositionSelectionScreen({super.key});
@@ -24,13 +24,13 @@ class PositionSelectionScreen extends StatelessWidget {
               Wrap(
                 spacing: 20,
                 children: [
-                  // ───────── manager 버튼 ─────────
+                  // ───────── manager 버튼 (수정됨) ─────────
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => GroupCreateScreen(), // const 제거
+                          builder: (_) => const AddTeammatesScreen(), // ✅ 이걸로 수정!
                         ),
                       );
                     },
