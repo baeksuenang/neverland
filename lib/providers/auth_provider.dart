@@ -1,58 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../screens/group/group_screen.dart';
 import '../screens/position_selection_screen.dart';
 
 class AuthProvider with ChangeNotifier {
-  final emailController = TextEditingController();
+  final emailController    = TextEditingController();
   final passwordController = TextEditingController();
   String message = '';
 
   Future<void> login(BuildContext context) async {
+    message = '';
+    notifyListeners();
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
+        email:    emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-      message = '로그인 성공!';
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const GroupScreen()),
-      );
+      _goNext(context);
     } on FirebaseAuthException catch (e) {
-      message = '로그인 실패: [${e.code}] ${e.message}';
-    } catch (e) {
-      message = '로그인 실패: $e';
-    } finally {
+      message = '로그인 실패: ${e.message ?? e.code}';
       notifyListeners();
     }
   }
 
   Future<void> register(BuildContext context) async {
+    message = '';
+    notifyListeners();
     try {
       await FirebaseAuth.instance.createUserWithEmailAndPassword(
-        email: emailController.text.trim(),
+        email:    emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-      message = '회원가입 성공!';
-
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const PositionSelectionScreen()),
-      );
+      _goNext(context);
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-already-in-use') {
-        message = 'This username is already taken';
-      } else {
-        message = '회원가입 실패: [${e.code}] ${e.message}';
-      }
-    } catch (e) {
-      message = '회원가입 실패: $e';
-    } finally {
+      message = e.code == 'email-already-in-use'
+          ? '이미 사용 중인 이메일입니다'
+          : '회원가입 실패: ${e.message ?? e.code}';
       notifyListeners();
     }
   }
 
+  void _goNext(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const PositionSelectionScreen()),
+    );
+  }
 
   @override
   void dispose() {
