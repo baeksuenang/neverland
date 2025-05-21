@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../screens/group_screen.dart'; // 그룹 화면 import
+import '../screens/group/group_screen.dart'; // 그룹 화면 import
 
 class GoodLoginProvider with ChangeNotifier {
   final emailController = TextEditingController();

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/group_service.dart'; // 그룹 관련 서비스 불러오기
+import '../../services/group_service.dart'; // 그룹 관련 서비스 불러오기
 
 class GroupScreen extends StatefulWidget {
   const GroupScreen({Key? key}) : super(key: key);

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../screens/group_screen.dart';
+import 'group/group_screen.dart';
 
 class AuthProvider with ChangeNotifier {
   final emailController = TextEditingController();
