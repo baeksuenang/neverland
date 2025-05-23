@@ -1,6 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class AddTeammatesScreen extends StatefulWidget {
   const AddTeammatesScreen({super.key});
@@ -11,24 +10,22 @@ class AddTeammatesScreen extends StatefulWidget {
 
 class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
   final TextEditingController _idController = TextEditingController();
-  String? _foundId;
-
-  // ID → 이미지 경로 매핑
   final Map<String, String> _profileMap = {};
+  final List<String> _addedIds = [];
   final Random _random = Random();
 
   void _onConfirm() {
     final id = _idController.text.trim();
 
-    if (id.isNotEmpty) {
-      // ID에 아직 프로필이 없으면 랜덤으로 하나 배정
+    if (id.isNotEmpty && !_addedIds.contains(id)) {
       _profileMap.putIfAbsent(id, () {
-        int idx = _random.nextInt(4) + 1; // 1~4
-        return 'assets/people$idx.png';
+        int idx = _random.nextInt(4) + 1; // 1 ~ 4 중 하나
+        return 'assets/people$idx.png';   // PNG 경로로 수정
       });
 
       setState(() {
-        _foundId = id;
+        _addedIds.add(id);
+        _idController.clear();
       });
     }
   }
@@ -81,8 +78,6 @@ class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // 가운데 Confirm 버튼
               Center(
                 child: ElevatedButton(
                   onPressed: _onConfirm,
@@ -97,46 +92,43 @@ class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
                   child: const Text('Confirm', style: TextStyle(fontSize: 16)),
                 ),
               ),
-
               const SizedBox(height: 30),
-
-              // 팀원 카드
-              if (_foundId != null) ...[
-                Container(
-                  decoration: shadowStyle,
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                  child: Row(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: SvgPicture.asset(
-                          _profileMap[_foundId]!, // ID별로 고정된 프로필
-                          width: 40,
-                          height: 40,
+              ..._addedIds.map((id) => Container(
+                decoration: shadowStyle,
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(100),
+                      child: Image.asset(
+                        _profileMap[id]!,
+                        width: 40,
+                        height: 40,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        id,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _foundId!,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                    ),
+                    const Text(
+                      '+',
+                      style: TextStyle(
+                        color: Colors.tealAccent,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
                       ),
-                      const Text(
-                        '+',
-                        style: TextStyle(
-                          color: Colors.tealAccent,
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ]
+              )),
             ],
           ),
         ),
