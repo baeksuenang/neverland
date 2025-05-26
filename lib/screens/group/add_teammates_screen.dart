@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../sleeptime/sleep_time_screen.dart';
+
 
 class AddTeammatesScreen extends StatefulWidget {
   const AddTeammatesScreen({super.key});
@@ -51,9 +53,9 @@ class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
   }
 
   void _onFinish() {
-    // 원하는 화면 이동 또는 데이터 전송 처리
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Team finalized!')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const SleepTimeScreen()),
     );
   }
 
