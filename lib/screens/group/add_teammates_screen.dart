@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddTeammatesScreen extends StatefulWidget {
   const AddTeammatesScreen({super.key});
@@ -13,18 +15,37 @@ class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
   final List<String> _addedIds = [];
   String? _selectedToRemove;
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   String _getProfileImage(String id) {
     final idx = (id.hashCode.abs() % 4) + 1;
     return 'assets/people$idx.png';
   }
 
-  void _search() {
+  Future<void> _search() async {
     final input = _idController.text.trim();
     if (input.isEmpty || _addedIds.contains(input) || _addedIds.length >= 3) return;
-    setState(() {
-      _searchResultId = input;
-    });
+
+    try {
+      final doc = await _firestore.collection('users').doc(input).get();
+
+      if (doc.exists) {
+        setState(() {
+          _searchResultId = input;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('해당 ID는 존재하지 않습니다.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('검색 중 오류 발생: $e')),
+      );
+    }
   }
+
 
   void _addMember(String id) {
     if (_addedIds.contains(id) || _addedIds.length >= 3) return;
@@ -50,11 +71,34 @@ class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
     });
   }
 
-  void _onFinish() {
-    // 원하는 화면 이동 또는 데이터 전송 처리
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Team finalized!')),
-    );
+  Future<void> _onFinish() async {
+    final currentUser = _auth.currentUser;
+    if (currentUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('로그인이 필요합니다.')),
+      );
+      return;
+    }
+
+    final List<String> members = [currentUser.uid, ..._addedIds];
+
+    final groupData = {
+      'leaderId': currentUser.uid,
+      'members': members,
+      'createdAt': FieldValue.serverTimestamp(),
+    };
+
+    try {
+      await _firestore.collection('groups').add(groupData);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('팀이 성공적으로 저장되었습니다!')),
+      );
+      Navigator.pop(context); // 원하는 화면으로 이동해도 됨
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('오류 발생: $e')),
+      );
+    }
   }
 
   @override
@@ -94,7 +138,7 @@ class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
               ),
               const SizedBox(height: 30),
 
-              // ✅ 팀원 프로필 보여주는 박스
+              // 팀원 프로필
               if (_addedIds.isNotEmpty)
                 Container(
                   height: 100,
@@ -158,7 +202,7 @@ class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
                   ),
                 ),
 
-              // ✅ 검색 결과
+              // 검색 결과
               if (_searchResultId != null &&
                   !_addedIds.contains(_searchResultId) &&
                   _addedIds.length < 3) ...[
@@ -202,7 +246,7 @@ class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
                 ),
               ],
 
-              // ✅ Finish 버튼
+              // Finish 버튼
               if (_addedIds.length == 3)
                 ElevatedButton(
                   onPressed: _onFinish,
