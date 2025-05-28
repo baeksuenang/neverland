@@ -1,4 +1,6 @@
+// sleep_time_screen.dart
 import 'package:flutter/material.dart';
+import '../push_screen.dart';
 
 class SleepTimeScreen extends StatefulWidget {
   const SleepTimeScreen({super.key});
@@ -100,59 +102,48 @@ class _SleepTimeScreenState extends State<SleepTimeScreen> {
               const SizedBox(height: 30),
               const Text(
                 'decide your trip time',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 22,
-                  fontWeight: FontWeight.w500,
-                ),
+                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 40),
               _buildTimeSlot(
                 hour: sleepHour,
                 minute: sleepMinute,
                 iconPath: 'assets/Moon.png',
-                onTapHour: () => _selectNumber(
-                  max: 24,
-                  onSelected: (val) => setState(() => sleepHour = val),
-                ),
-                onTapMinute: () => _selectNumber(
-                  max: 60,
-                  onSelected: (val) => setState(() => sleepMinute = val),
-                ),
+                onTapHour: () => _selectNumber(max: 24, onSelected: (val) => setState(() => sleepHour = val)),
+                onTapMinute: () => _selectNumber(max: 60, onSelected: (val) => setState(() => sleepMinute = val)),
               ),
               const SizedBox(height: 30),
               _buildTimeSlot(
                 hour: wakeHour,
                 minute: wakeMinute,
                 iconPath: 'assets/Sun.png',
-                onTapHour: () => _selectNumber(
-                  max: 24,
-                  onSelected: (val) => setState(() => wakeHour = val),
-                ),
-                onTapMinute: () => _selectNumber(
-                  max: 60,
-                  onSelected: (val) => setState(() => wakeMinute = val),
-                ),
+                onTapHour: () => _selectNumber(max: 24, onSelected: (val) => setState(() => wakeHour = val)),
+                onTapMinute: () => _selectNumber(max: 60, onSelected: (val) => setState(() => wakeMinute = val)),
               ),
               const Spacer(),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, '/push');
+                    if (sleepHour == null || sleepMinute == null || wakeHour == null || wakeMinute == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('모든 시간을 설정해주세요.'),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
+                    } else {
+                      Navigator.push(context, MaterialPageRoute(builder: (_) => const PushScreen()));
+                    }
                   },
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.tealAccent,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  child: const Text(
-                    'Next',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  child: const Text('Next', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ),
               ),
               const SizedBox(height: 20),
