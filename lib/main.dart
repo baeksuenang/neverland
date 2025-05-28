@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:neverlandv1/screens/sleeptime/sleep_time_screen.dart';
 import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
+import 'screens/push_screen.dart';
 import 'screens/intro_screen.dart';
 
 
@@ -27,8 +29,15 @@ class NeverlandApp extends StatelessWidget {
         title: 'Neverland App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: const IntroScreen(),
+        home: const SleepTimeScreen(),
+
+
+        // ✅ 여기에 route 등록!
+        routes: {
+          '/push': (context) => const PushScreen(),
+        },
       ),
     );
   }
 }
+

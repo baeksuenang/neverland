@@ -107,8 +107,6 @@ class _SleepTimeScreenState extends State<SleepTimeScreen> {
                 ),
               ),
               const SizedBox(height: 40),
-
-              // 🌙 취침 시간
               _buildTimeSlot(
                 hour: sleepHour,
                 minute: sleepMinute,
@@ -122,10 +120,7 @@ class _SleepTimeScreenState extends State<SleepTimeScreen> {
                   onSelected: (val) => setState(() => sleepMinute = val),
                 ),
               ),
-
               const SizedBox(height: 30),
-
-              // ☀️ 기상 시간
               _buildTimeSlot(
                 hour: wakeHour,
                 minute: wakeMinute,
@@ -139,19 +134,16 @@ class _SleepTimeScreenState extends State<SleepTimeScreen> {
                   onSelected: (val) => setState(() => wakeMinute = val),
                 ),
               ),
-
               const Spacer(),
-
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    print('기상: $wakeHour:$wakeMinute / 취침: $sleepHour:$sleepMinute');
-                    // TODO: 다음 화면 or 저장
+                    Navigator.pushNamed(context, '/push');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.tealAccent,
-                    foregroundColor: Colors.white, // ✅ 글자 흰색
+                    foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -163,7 +155,6 @@ class _SleepTimeScreenState extends State<SleepTimeScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
             ],
           ),
