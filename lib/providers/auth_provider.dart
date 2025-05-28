@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../screens/group/add_teammates_screen.dart';
+import '../screens/main_screen.dart';
 import '../screens/position_selection_screen.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -14,18 +16,44 @@ class AuthProvider with ChangeNotifier {
   Future<void> login(BuildContext context) async {
     message = '';
     notifyListeners();
+
     try {
-      await _auth.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      await _registerUserIfNotExists(); // 🔹 로그인 후 Firestore 등록
+      await _registerUserIfNotExists(); // Firestore에 users 등록
+      await _checkGroupAndNavigate(context); // 그룹 여부 확인 후 이동
 
-      _goNext(context);
     } on FirebaseAuthException catch (e) {
       message = '로그인 실패: ${e.message ?? e.code}';
       notifyListeners();
+    }
+  }
+
+  Future<void> _checkGroupAndNavigate(BuildContext context) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    final groups = await FirebaseFirestore.instance
+        .collection('groups')
+        .where('members', arrayContains: uid)
+        .limit(1)
+        .get();
+
+    if (groups.docs.isNotEmpty) {
+      // 그룹이 있음 → 메인 화면으로 이동
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const MainScreen()), // 메인화면
+      );
+    } else {
+      // 그룹 없음 → 팀 구성 화면으로 이동
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const PositionSelectionScreen()),
+      );
     }
   }
 
@@ -40,7 +68,6 @@ class AuthProvider with ChangeNotifier {
 
       await _registerUser(); // 🔹 회원가입 시 Firestore 등록
 
-      _goNext(context);
     } on FirebaseAuthException catch (e) {
       message = e.code == 'email-already-in-use'
           ? '이미 사용 중인 이메일입니다'

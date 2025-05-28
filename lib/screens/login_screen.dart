@@ -38,12 +38,13 @@ class LoginScreen extends StatelessWidget {
 
               // ── Register 링크 자리만 확보 ───────────
               TextButton(
-                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Register 화면은 다음 단계에서!')),
+                onPressed: () => auth.register(context),
+                child: const Text(
+                  'Register now',
+                  style: TextStyle(color: Colors.tealAccent),
                 ),
-                child: const Text('Register now',
-                    style: TextStyle(color: Colors.tealAccent)),
               ),
+
               const SizedBox(height: 10),
 
               // ── 에러 메시지 ────────────────────────
