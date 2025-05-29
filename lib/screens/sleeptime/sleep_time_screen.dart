@@ -1,13 +1,19 @@
 // sleep_time_screen.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 import '../push_screen.dart';
 
 class SleepTimeScreen extends StatefulWidget {
-  const SleepTimeScreen({super.key});
+  final String groupId;
+
+  const SleepTimeScreen({super.key, required this.groupId});
 
   @override
   State<SleepTimeScreen> createState() => _SleepTimeScreenState();
 }
+
 
 class _SleepTimeScreenState extends State<SleepTimeScreen> {
   int? sleepHour, sleepMinute;
@@ -124,7 +130,7 @@ class _SleepTimeScreenState extends State<SleepTimeScreen> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (sleepHour == null || sleepMinute == null || wakeHour == null || wakeMinute == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -132,10 +138,39 @@ class _SleepTimeScreenState extends State<SleepTimeScreen> {
                           backgroundColor: Colors.redAccent,
                         ),
                       );
-                    } else {
-                      Navigator.push(context, MaterialPageRoute(builder: (_) => const PushScreen()));
+                      return;
+                    }
+
+                    try {
+                      await FirebaseFirestore.instance
+                          .collection('groups')
+                          .doc(widget.groupId)
+                          .update({
+                        'sleepTime': {
+                          'hour': sleepHour,
+                          'minute': sleepMinute,
+                        },
+                        'wakeTime': {
+                          'hour': wakeHour,
+                          'minute': wakeMinute,
+                        }
+                      });
+
+                      // 저장 성공 후 다음 화면으로 이동
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const PushScreen()),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('오류 발생: $e'),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
                     }
                   },
+
 
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.tealAccent,

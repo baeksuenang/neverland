@@ -10,9 +10,7 @@ import 'screens/intro_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
   runApp(const NeverlandApp());
 }
 
@@ -29,7 +27,7 @@ class NeverlandApp extends StatelessWidget {
         title: 'Neverland App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: const SleepTimeScreen(),
+        home: const IntroScreen(),
 
 
         // ✅ 여기에 route 등록!

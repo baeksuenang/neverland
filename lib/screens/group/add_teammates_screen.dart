@@ -89,13 +89,19 @@ class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
     };
 
     try {
-      await _firestore.collection('groups').add(groupData);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('팀이 성공적으로 저장되었습니다!')),
-      );
+      final groupRef = await _firestore.collection('groups').add(groupData);
+      final groupId = groupRef.id;
+
+
+
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const SleepTimeScreen()),
+        MaterialPageRoute(
+          builder: (_) => SleepTimeScreen(groupId: groupId),
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('팀이 성공적으로 저장되었습니다!')),
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -103,6 +109,7 @@ class _AddTeammatesScreenState extends State<AddTeammatesScreen> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../screens/group/add_teammates_screen.dart';
 import '../screens/main_screen.dart';
 import '../screens/position_selection_screen.dart';
+import '../screens/push_screen.dart';
 
 class AuthProvider with ChangeNotifier {
   final emailController = TextEditingController();
@@ -46,7 +47,7 @@ class AuthProvider with ChangeNotifier {
       // 그룹이 있음 → 메인 화면으로 이동
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const MainScreen()), // 메인화면
+        MaterialPageRoute(builder: (_) => const PushScreen()), // 메인화면
       );
     } else {
       // 그룹 없음 → 팀 구성 화면으로 이동
