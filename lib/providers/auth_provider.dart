@@ -44,10 +44,14 @@ class AuthProvider with ChangeNotifier {
         .get();
 
     if (groups.docs.isNotEmpty) {
-      // 그룹이 있음 → 메인 화면으로 이동
+      final teamId = groups.docs.first.id;
+      final userId = FirebaseAuth.instance.currentUser!.uid;
+
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const PushScreen()), // 메인화면
+        MaterialPageRoute(
+          builder: (_) => PushScreen(teamId: teamId, userId: userId),
+        ),
       );
     } else {
       // 그룹 없음 → 팀 구성 화면으로 이동

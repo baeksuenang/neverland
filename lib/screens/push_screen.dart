@@ -1,8 +1,44 @@
 import 'package:flutter/material.dart';
-import 'push_morning.dart'; // 새 화면 import
+import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_database/firebase_database.dart';
+
 
 class PushScreen extends StatelessWidget {
-  const PushScreen({super.key});
+  final String teamId;
+  final String userId;
+
+  const PushScreen({super.key, required this.teamId, required this.userId});
+
+  Future<void> _lockAndExit(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // 1. Firebase Realtime Database에 "sleeping" 기록
+    final dbRef = FirebaseDatabase.instance.ref();
+    await dbRef.child('teamStatus/$teamId/members/$userId').set('sleeping');
+
+    // 2. SharedPreferences에 잠금 상태 기록
+    await prefs.setBool('isLocked', true);
+
+    // 3. 푸시 알림 전송
+    final notifications = FlutterLocalNotificationsPlugin();
+    const androidDetails = AndroidNotificationDetails(
+      'lock_channel', '수면잠금',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+    const details = NotificationDetails(android: androidDetails);
+    await notifications.show(
+      0,
+      '잠금 상태입니다',
+      '수면시간입니다. 핸드폰 사용이 제한됩니다.',
+      details,
+    );
+
+    // 4. 앱 종료 (홈으로 나감)
+    SystemNavigator.pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,14 +47,11 @@ class PushScreen extends StatelessWidget {
       body: SafeArea(
         child: Stack(
           children: [
-            // 상단 Z 로고 + 톱니바퀴
             Positioned(
               top: 20,
               left: 0,
               right: 0,
-              child: Center(
-                child: Image.asset('assets/z.png', height: 60),
-              ),
+              child: Center(child: Image.asset('assets/z.png', height: 60)),
             ),
             Positioned(
               top: 20,
@@ -38,14 +71,11 @@ class PushScreen extends StatelessWidget {
                 ),
               ),
             ),
-
-            // 본문 내용
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 90),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // morning.png
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: Image.asset(
@@ -55,25 +85,12 @@ class PushScreen extends StatelessWidget {
                       fit: BoxFit.cover,
                     ),
                   ),
-
                   const SizedBox(height: 40),
-
-                  // PUSH 버튼 → push_morning.dart로 이동
                   GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const PushMorningScreen(),
-                        ),
-                      );
-                    },
+                    onTap: () => _lockAndExit(context),
                     child: Image.asset('assets/push.png', width: 200),
                   ),
-
                   const SizedBox(height: 40),
-
-                  // 페이지 인디케이터
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [

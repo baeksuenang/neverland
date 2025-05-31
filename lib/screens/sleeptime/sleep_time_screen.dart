@@ -159,7 +159,12 @@ class _SleepTimeScreenState extends State<SleepTimeScreen> {
                       // 저장 성공 후 다음 화면으로 이동
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const PushScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => PushScreen(
+                            teamId: widget.groupId,
+                            userId: FirebaseAuth.instance.currentUser!.uid,
+                          ),
+                        ),
                       );
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(
