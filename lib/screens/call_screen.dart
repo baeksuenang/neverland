@@ -70,16 +70,6 @@ class CallScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _dot(isActive: true),
-                      const SizedBox(width: 8),
-                      _dot(isActive: false),
-                    ],
-                  ),
-                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -102,19 +92,8 @@ class CallScreen extends StatelessWidget {
             child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 8),
-          Image.asset(imagePath, width: 120), // 키운 상태 유지
+          Image.asset(imagePath, width: 120),
         ],
-      ),
-    );
-  }
-
-  Widget _dot({required bool isActive}) {
-    return Container(
-      width: 10,
-      height: 10,
-      decoration: BoxDecoration(
-        color: isActive ? Colors.white : Colors.tealAccent,
-        shape: BoxShape.circle,
       ),
     );
   }

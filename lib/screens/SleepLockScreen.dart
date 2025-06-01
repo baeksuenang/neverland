@@ -27,16 +27,9 @@ class _SleepLockScreenState extends State<SleepLockScreen> with WidgetsBindingOb
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       setState(() {
-        isLocked = true; // 다시 앱으로 돌아오면 잠금상태 유지
+        isLocked = true; // 앱 복귀 시 잠금 유지
       });
     }
-  }
-
-  void _unlock() {
-    setState(() {
-      isLocked = false;
-    });
-    Navigator.pop(context); // 이전 화면으로 되돌아감
   }
 
   @override
@@ -44,22 +37,23 @@ class _SleepLockScreenState extends State<SleepLockScreen> with WidgetsBindingOb
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
-        child: isLocked
-            ? Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              '잠금 상태입니다',
+          children: const [
+            Icon(Icons.lock, size: 80, color: Colors.tealAccent),
+            SizedBox(height: 20),
+            Text(
+              '현재 잠금 상태입니다',
               style: TextStyle(color: Colors.white, fontSize: 24),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 40),
-            ElevatedButton(
-              onPressed: _unlock,
-              child: const Text('기상하기'),
+            SizedBox(height: 12),
+            Text(
+              '기상 버튼을 눌러야 해제됩니다',
+              style: TextStyle(color: Colors.white60, fontSize: 16),
             ),
           ],
-        )
-            : const SizedBox(),
+        ),
       ),
     );
   }

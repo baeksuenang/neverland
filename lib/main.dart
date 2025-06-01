@@ -9,8 +9,12 @@ import 'package:neverlandv1/providers/auth_provider.dart' as my_provider;
 import 'screens/push_screen.dart';
 import 'screens/intro_screen.dart';
 import 'screens/push_morning.dart';
+import 'screens/SleepLockScreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'app_lifecycle_observer.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +22,8 @@ void main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final isLocked = prefs.getBool('isLocked') ?? false;
+
+  WidgetsBinding.instance.addObserver(AppLifecycleObserver(navigatorKey));
 
   runApp(NeverlandApp(isLocked: isLocked));
 }
@@ -34,20 +40,21 @@ class NeverlandApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => my_provider.AuthProvider()),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         title: 'Neverland App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: RootController(isLocked: isLocked),
+        home: isLocked ? const SleepLockScreen() : const RootController(forceSleepLock: null),
       ),
     );
   }
 }
 
 class RootController extends StatelessWidget {
-  final bool isLocked;
-  const RootController({super.key, required this.isLocked});
+  final bool? forceSleepLock;
+  const RootController({super.key, this.forceSleepLock});
 
-  Future<String> _checkSleepOrWakeStatus(String teamId) async {
+  Future<String> _checkSleepOrWakeStatus(String teamId, String userId) async {
     final now = DateTime.now();
     final doc = await FirebaseFirestore.instance.collection('groups').doc(teamId).get();
     final data = doc.data();
@@ -64,14 +71,47 @@ class RootController extends StatelessWidget {
     final today = DateTime(now.year, now.month, now.day);
     final sleepTime = today.add(Duration(hours: sleepHour, minutes: sleepMinute));
     final wakeTime = today.add(Duration(hours: wakeHour, minutes: wakeMinute));
+    final preSleepStart = sleepTime.subtract(const Duration(hours: 2));
 
-    if (now.isAfter(sleepTime) && now.isBefore(wakeTime)) {
-      return 'sleep';
-    } else if (now.isAfter(wakeTime)) {
+    final prefs = await SharedPreferences.getInstance();
+    final dbRef = FirebaseDatabase.instance.ref();
+
+    // wake 상태
+    if (now.isAfter(wakeTime) && now.isBefore(wakeTime.add(const Duration(hours: 2)))) {
       return 'wake';
-    } else {
+    }
+
+    // wake 상태 종료 (2시간 경과) → 상태 초기화
+    if (now.isAfter(wakeTime.add(const Duration(hours: 2))) &&
+        now.isBefore(sleepTime.subtract(const Duration(hours: 2)))){
+      final membersSnapshot = await dbRef.child('teamStatus/$teamId/members').get();
+      if (membersSnapshot.exists) {
+        final members = (membersSnapshot.value as Map).keys;
+        for (var uid in members) {
+          await dbRef.child('teamStatus/$teamId/members/$uid').set('none');
+        }
+        await dbRef.child('teamStatus/$teamId/isEveryoneAwake').set(false);
+        await prefs.setBool('isLocked', false);
+      }
       return 'none';
     }
+
+    // 수면 시간대
+    if (now.isAfter(sleepTime) && now.isBefore(wakeTime)) {
+      final userStatusSnapshot = await dbRef.child('teamStatus/$teamId/members/$userId').get();
+      if (userStatusSnapshot.value != 'sleeping') {
+        await dbRef.child('teamStatus/$teamId/members/$userId').set('sleeping');
+      }
+      await prefs.setBool('isLocked', true);
+      return 'sleep';
+    }
+
+    // 수면 준비 시간
+    if (now.isAfter(preSleepStart) && now.isBefore(sleepTime)) {
+      return 'prepareToSleep';
+    }
+
+    return 'none';
   }
 
   @override
@@ -79,7 +119,7 @@ class RootController extends StatelessWidget {
     final currentUser = FirebaseAuth.instance.currentUser;
 
     if (currentUser == null) {
-      return const IntroScreen(); // 로그인 전
+      return const IntroScreen();
     }
 
     final userId = currentUser.uid;
@@ -104,7 +144,7 @@ class RootController extends StatelessWidget {
         final teamId = docs.first.id;
 
         return FutureBuilder(
-          future: _checkSleepOrWakeStatus(teamId),
+          future: _checkSleepOrWakeStatus(teamId, userId),
           builder: (context, snapshot2) {
             if (!snapshot2.hasData) {
               return const Scaffold(
@@ -114,22 +154,20 @@ class RootController extends StatelessWidget {
             }
 
             final status = snapshot2.data!;
-            if (status == 'sleep' && !isLocked) {
-              // 자동으로 잠금 처리
-              final dbRef = FirebaseDatabase.instance.ref();
-              dbRef.child('teamStatus/$teamId/members/$userId').set('sleeping');
-              SharedPreferences.getInstance().then((prefs) {
-                prefs.setBool('isLocked', true);
-              });
-              Future.delayed(Duration.zero, () => SystemNavigator.pop());
-              return const SizedBox(); // pop() 이후 반환용
+
+            if (forceSleepLock == true || status == 'sleep') {
+              return const SleepLockScreen();
             }
 
-            if (status == 'wake' || isLocked) {
+            if (status == 'wake') {
               return PushMorningScreen(teamId: teamId, userId: userId);
             }
 
-            return PushScreen(teamId: teamId, userId: userId);
+            if (status == 'prepareToSleep') {
+              return PushScreen(teamId: teamId, userId: userId);
+            }
+
+            return const IntroScreen();
           },
         );
       },

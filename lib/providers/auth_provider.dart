@@ -5,6 +5,8 @@ import '../screens/group/add_teammates_screen.dart';
 import '../screens/main_screen.dart';
 import '../screens/position_selection_screen.dart';
 import '../screens/push_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class AuthProvider with ChangeNotifier {
   final emailController = TextEditingController();
@@ -46,6 +48,7 @@ class AuthProvider with ChangeNotifier {
     if (groups.docs.isNotEmpty) {
       final teamId = groups.docs.first.id;
       final userId = FirebaseAuth.instance.currentUser!.uid;
+      await initTeamStatus(teamId);
 
       Navigator.pushReplacement(
         context,
@@ -117,5 +120,25 @@ class AuthProvider with ChangeNotifier {
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+}
+
+Future<void> initTeamStatus(String teamId) async {
+  final firestore = FirebaseFirestore.instance;
+  final rtdbRef = FirebaseDatabase.instance.ref();
+
+  try {
+    // Firestore에서 팀 멤버 목록 가져오기
+    final teamDoc = await firestore.collection('groups').doc(teamId).get();
+    final members = List<String>.from(teamDoc['members']);
+
+    // Realtime Database에 상태 초기화
+    for (final uid in members) {
+      await rtdbRef.child('teamStatus/$teamId/members/$uid').set('none');
+    }
+
+    print('✅ teamStatus 초기화 완료');
+  } catch (e) {
+    print('🔥 teamStatus 초기화 실패: $e');
   }
 }
