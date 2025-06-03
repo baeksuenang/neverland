@@ -46,9 +46,22 @@ class AuthProvider with ChangeNotifier {
         .get();
 
     if (groups.docs.isNotEmpty) {
-      final teamId = groups.docs.first.id;
+      final doc = groups.docs.first;
+      final teamId = doc.id;
       final userId = FirebaseAuth.instance.currentUser!.uid;
-      await initTeamStatus(teamId);
+
+      // ✅ teamStatus 초기화 여부 확인
+      final data = doc.data();
+      final initialized = data['teamStatusInitialized'] == true;
+
+      if (!initialized) {
+        await initTeamStatus(teamId);
+        // ✅ Firestore에 초기화 플래그 true로 저장
+        await FirebaseFirestore.instance
+            .collection('groups')
+            .doc(teamId)
+            .update({'teamStatusInitialized': true});
+      }
 
       Navigator.pushReplacement(
         context,
@@ -57,13 +70,13 @@ class AuthProvider with ChangeNotifier {
         ),
       );
     } else {
-      // 그룹 없음 → 팀 구성 화면으로 이동
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const PositionSelectionScreen()),
       );
     }
   }
+
 
   Future<void> register(BuildContext context) async {
     message = '';

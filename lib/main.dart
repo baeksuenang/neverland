@@ -44,7 +44,7 @@ class NeverlandApp extends StatelessWidget {
         title: 'Neverland App',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(primarySwatch: Colors.blue),
-        home: isLocked ? const SleepLockScreen() : const RootController(forceSleepLock: null),
+        home: RootController(forceSleepLock: isLocked),
       ),
     );
   }
@@ -72,30 +72,17 @@ class RootController extends StatelessWidget {
     final sleepTime = today.add(Duration(hours: sleepHour, minutes: sleepMinute));
     final wakeTime = today.add(Duration(hours: wakeHour, minutes: wakeMinute));
     final preSleepStart = sleepTime.subtract(const Duration(hours: 2));
+    final postWakeEnd = wakeTime.add(const Duration(hours: 2));
 
     final prefs = await SharedPreferences.getInstance();
     final dbRef = FirebaseDatabase.instance.ref();
 
     // wake 상태
-    if (now.isAfter(wakeTime) && now.isBefore(wakeTime.add(const Duration(hours: 2)))) {
+    if (now.isAfter(wakeTime) && now.isBefore(postWakeEnd)) {
       return 'wake';
     }
 
-    // wake 상태 종료 (2시간 경과) → 상태 초기화
-    if (now.isAfter(wakeTime.add(const Duration(hours: 2))) &&
-        now.isBefore(sleepTime.subtract(const Duration(hours: 2)))){
-      final membersSnapshot = await dbRef.child('teamStatus/$teamId/members').get();
-      if (membersSnapshot.exists) {
-        final members = (membersSnapshot.value as Map).keys;
-        for (var uid in members) {
-          await dbRef.child('teamStatus/$teamId/members/$uid').set('none');
-        }
-        await dbRef.child('teamStatus/$teamId/isEveryoneAwake').set(false);
-        await prefs.setBool('isLocked', false);
-      }
-      return 'none';
-    }
-
+    // 상태 초기화는 여기서 하지 않음 → 앱 시작 시에 한 번만 관리 (RootController에서 수행하지 않음)
     // 수면 시간대
     if (now.isAfter(sleepTime) && now.isBefore(wakeTime)) {
       final userStatusSnapshot = await dbRef.child('teamStatus/$teamId/members/$userId').get();
@@ -109,6 +96,16 @@ class RootController extends StatelessWidget {
     // 수면 준비 시간
     if (now.isAfter(preSleepStart) && now.isBefore(sleepTime)) {
       return 'prepareToSleep';
+    }
+
+    // 기상 2시간 이후이거나 취침 2시간 전 이전인 경우에만 상태 초기화
+    if (now.isBefore(preSleepStart) || now.isAfter(postWakeEnd)) {
+      // 단, 현재 유저 상태가 none이 아닌 경우에만
+      final userSnapshot = await dbRef.child('teamStatus/$teamId/members/$userId').get();
+      if (userSnapshot.exists && userSnapshot.value != 'none') {
+        await dbRef.child('teamStatus/$teamId/members/$userId').set('none');
+        await prefs.setBool('isLocked', false);
+      }
     }
 
     return 'none';
@@ -155,7 +152,11 @@ class RootController extends StatelessWidget {
 
             final status = snapshot2.data!;
 
-            if (forceSleepLock == true || status == 'sleep') {
+            if (forceSleepLock == true && status != 'wake') {
+              return const SleepLockScreen();
+            }
+
+            if (status == 'sleep') {
               return const SleepLockScreen();
             }
 

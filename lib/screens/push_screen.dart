@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 
 class PushScreen extends StatelessWidget {
   final String teamId;
@@ -17,21 +16,28 @@ class PushScreen extends StatelessWidget {
     final int sleepHour = sleepData['hour'];
     final int sleepMinute = sleepData['minute'];
 
-    final now = DateTime.now();
-    final sleepTime = DateTime(now.year, now.month, now.day, sleepHour, sleepMinute);
+    final now = DateTime.now().toLocal();  // ✅ 한국 시간으로
+    DateTime sleepTime = DateTime(now.year, now.month, now.day, sleepHour, sleepMinute);
 
-    // 2시간 전 시간 계산
+    // 다음날로 넘어가는 경우 처리
+    if (sleepTime.isBefore(now)) {
+      sleepTime = sleepTime.add(const Duration(days: 1));
+    }
+
     final thresholdTime = sleepTime.subtract(const Duration(hours: 2));
 
-    return now.isAfter(thresholdTime);
+    print('✅ 현재시간: $now');
+    print('✅ 수면시간: $sleepTime');
+    print('✅ 수면가능시작시간(2시간전): $thresholdTime');
+
+    return now.isAfter(thresholdTime) || now.isAtSameMomentAs(thresholdTime);
   }
 
   Future<void> _lockAndExit(BuildContext context) async {
     final prefs = await SharedPreferences.getInstance();
-
     final dbRef = FirebaseDatabase.instance.ref();
-    await dbRef.child('teamStatus/$teamId/members/$userId').set('sleeping');
 
+    await dbRef.child('teamStatus/$teamId/members/$userId').set('sleeping');
     await prefs.setBool('isLocked', true);
 
     SystemNavigator.pop();

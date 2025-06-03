@@ -10,18 +10,15 @@ class AppLifecycleObserver extends WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed) {
-      final prefs = await SharedPreferences.getInstance();
-      final isLocked = prefs.getBool('isLocked') ?? false;
+    final prefs = await SharedPreferences.getInstance();
+    final isLocked = prefs.getBool('isLocked') ?? false;
 
-      if (isLocked) {
-        navigatorKey.currentState?.push(
-          MaterialPageRoute(
-            builder: (_) => const SleepLockScreen(),
-            fullscreenDialog: true,
-          ),
-        );
-      }
+    if (state == AppLifecycleState.resumed && isLocked) {
+      navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const SleepLockScreen()),
+            (_) => false,
+      );
     }
   }
 }
+
