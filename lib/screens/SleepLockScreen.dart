@@ -1,5 +1,5 @@
-// sleep_lock_screen.dart
 import 'package:flutter/material.dart';
+import '../utils/lock_helper.dart'; // 실제 경로에 맞게 수정
 
 class SleepLockScreen extends StatefulWidget {
   const SleepLockScreen({super.key});
@@ -15,6 +15,9 @@ class _SleepLockScreenState extends State<SleepLockScreen> with WidgetsBindingOb
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    // ✅ 앱이 잠금 화면에 들어오면 즉시 폰 잠금 시도
+    LockHelper.lockPhone();
   }
 
   @override
@@ -28,6 +31,7 @@ class _SleepLockScreenState extends State<SleepLockScreen> with WidgetsBindingOb
     if (state == AppLifecycleState.resumed) {
       setState(() {
         isLocked = true; // 앱 복귀 시 잠금 유지
+        LockHelper.lockPhone(); // 복귀 시에도 다시 잠금 시도
       });
     }
   }
